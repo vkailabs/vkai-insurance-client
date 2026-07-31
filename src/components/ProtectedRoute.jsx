@@ -5,9 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import Spinner from './Spinner';
 
 export default function ProtectedRoute({ children }) {
-  const { user, initializing } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (initializing) {
+  // Wait for Firebase's first auth-state resolution before making any routing
+  // decision — never redirect while the auth state is still unknown.
+  if (loading) {
     return (
       <div className="page-center">
         <Spinner label="Restoring session…" />
@@ -15,6 +17,7 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
+  // Only redirect once we know for certain there is no authenticated user.
   if (!user) {
     return <Navigate to="/login" replace />;
   }

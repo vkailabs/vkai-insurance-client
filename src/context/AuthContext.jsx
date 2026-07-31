@@ -14,14 +14,18 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  // `initializing` is true until Firebase reports the first auth state, so
-  // protected routes don't flash to /login before the session is restored.
-  const [initializing, setInitializing] = useState(true);
+  // `loading` is true until Firebase reports the first auth state. Protected
+  // routes must wait for this before deciding, so they don't flash to /login
+  // while the session is still being restored (or right after sign-in, before
+  // onAuthStateChanged has propagated the freshly authenticated user).
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fires once on load with the restored user (or null), and again on every
+    // subsequent sign-in/sign-out. The first call is what flips `loading` off.
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
-      setInitializing(false);
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -44,7 +48,7 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
-  const value = { user, initializing, signup, login, logout };
+  const value = { user, loading, signup, login, logout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
