@@ -616,8 +616,36 @@ h4 {
   .page-header {
     flex-direction: column;
   }
+}
 
-  .navbar-links {
-    display: none;
+/* Below the desktop breakpoint the nav bar can't fit brand + links + user +
+   Logout on one row (e.g. iPhone widths ~390-430px). Stack it into two full-width
+   rows so nothing overflows horizontally or overlaps the page content below.
+   The nav stays in normal flow, so its taller height simply pushes content down.
+   Desktop (>=768px) is unaffected and keeps the original horizontal layout. */
+@media (max-width: 767.98px) {
+  .navbar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .navbar-left,
+  .navbar-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Let the user name take the remaining space and truncate, so the Logout
+     button always stays visible on the row. */
+  .navbar-user {
+    max-width: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .navbar-right .btn {
+    flex-shrink: 0;
   }
 }
