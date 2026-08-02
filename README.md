@@ -8,6 +8,12 @@ separate **client API** (`vkai-insurance-client-api`) over HTTP and uses **Fireb
 Authentication** for login/signup. It has no knowledge of the provider (Azure) side —
 all provider interaction happens through the client API.
 
+It's one half of a dual-cloud demo platform: this repo and its API run on **GCP**, while
+a fully independent **provider side runs on Azure**. The two clouds never share a database;
+they only exchange data over HTTPS. For the full story — what this project is and why it
+exists — see [BUSINESS_REQUIREMENTS.md](BUSINESS_REQUIREMENTS.md). For conventions and
+gotchas when working in this repo, see [CLAUDE.md](CLAUDE.md).
+
 ## Tech stack
 
 - **React 18 + Vite** — SPA, fast dev server / HMR
@@ -113,9 +119,15 @@ src/
   styles.css            App styles (kebab-case classes)
 ```
 
+## Deployment
+
+Deployed to **Vercel**. Because this is a client-side-routed SPA, the repo root includes a
+[`vercel.json`](vercel.json) rewrite that serves `index.html` for any non-asset path — without
+it, directly navigating to or refreshing a route like `/dashboard` or `/policies/:id` would
+404. **Don't remove that rewrite.** Build command is `npm run build` (output in `dist/`).
+
 ## Notes / scope
 
 - Premium payment is **virtual/simulated** — it matches what the API does; there is no
   real payment gateway.
-- No Docker/deployment config in this repo yet (a later phase); `npm run dev` is enough.
-- The provider portal is a separate app and is not part of this repo.
+- The provider portal is a separate app (Azure) and is not part of this repo.
