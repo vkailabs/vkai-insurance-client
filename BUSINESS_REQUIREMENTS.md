@@ -63,6 +63,10 @@ Where it shows:
   on the **policy card heading only**. Read from the **top-level `key`** on each policy object
   (already resolved from the catalog by the API). Nested premium and claim line items under a
   policy card are **not** individually prefixed.
+- **Policy detail page** (`/policies/:id`) — the single policy's plan name renders its `key`
+  as a prefix on the **main page heading only**. Read from the **top-level `key`** on the
+  policy object, falling back to the nested `policyCatalog.key`. Nested premium and claim line
+  items on this page are **not** individually prefixed.
 
 When `key` is `null`/absent/blank (e.g. a catalog entry not yet refreshed), the name is shown
 with **no prefix and no stray separator**.

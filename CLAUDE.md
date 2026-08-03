@@ -51,8 +51,10 @@ collision-suffixed `"PG2-2"`, and may be `null`). It is **display-only** and **r
 from the provider** — the client must **never generate or fabricate** it. It's a direct field
 on each catalog row (`GET /v1/catalog`) and a **top-level** field on each policy object
 (`GET /v1/policies`, already resolved from the catalog — prefer the top-level `key`). The UI
-renders it as a name prefix (e.g. `PG2 - Premium Gold 2024`) on the catalog page and on the
-policy card heading on the dashboard; use `formatPlanName(key, name)` in `src/lib/format.js`,
+renders it as a name prefix (e.g. `PG2 - Premium Gold 2024`) on the catalog page, on the
+policy card heading on the dashboard, and on the main heading of the single policy detail page
+(`/policies/:id`, preferring top-level `policy.key`, falling back to `policyCatalog.key`); use
+`formatPlanName(key, name)` in `src/lib/format.js`,
 which drops the prefix and separator entirely when `key` is null/absent/blank. Nested premium
 and claim line items are never individually prefixed.
 
