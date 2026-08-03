@@ -12,6 +12,18 @@ story see [BUSINESS_REQUIREMENTS.md](BUSINESS_REQUIREMENTS.md); for setup and ro
 Tech: React 18 + Vite, React Router 6, Firebase Auth (Web SDK), a plain `fetch` API client
 (`src/api/client.js`), and plain CSS (`src/styles.css`).
 
+## Keeping documentation current
+
+**If a change is significant, update the docs in the same commit** — not as a separate
+afterthought. A change counts as significant if it introduces a new field, a new business
+rule, a new architectural decision, a new piece of infrastructure/pipeline, or a newly
+discovered gotcha. In those cases, update this repo's own
+[BUSINESS_REQUIREMENTS.md](BUSINESS_REQUIREMENTS.md) and/or [README.md](README.md) (and this
+file, when the change affects conventions or gotchas) as part of the same commit that makes
+the change.
+
+Minor or purely cosmetic changes don't need a doc update.
+
 ## Naming conventions
 
 - **CSS class names:** `kebab-case` (e.g. `policy-card`, `navbar-inner`, `claim-badge`).
