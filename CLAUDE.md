@@ -46,6 +46,16 @@ data, **never assume snake_case**. Use:
 Also note: **Prisma `Decimal` values are serialized as strings** (e.g. `"100.00"`), so run
 money values through `Number(...)` / the helpers in `src/lib/format.js` before formatting.
 
+Catalog rows and policy objects also carry a provider-defined `key` (e.g. `"PG2"`, or a
+collision-suffixed `"PG2-2"`, and may be `null`). It is **display-only** and **read-through
+from the provider** — the client must **never generate or fabricate** it. It's a direct field
+on each catalog row (`GET /v1/catalog`) and a **top-level** field on each policy object
+(`GET /v1/policies`, already resolved from the catalog — prefer the top-level `key`). The UI
+renders it as a name prefix (e.g. `PG2 - Premium Gold 2024`) on the catalog page and on the
+policy card heading on the dashboard; use `formatPlanName(key, name)` in `src/lib/format.js`,
+which drops the prefix and separator entirely when `key` is null/absent/blank. Nested premium
+and claim line items are never individually prefixed.
+
 The one place snake_case *is* correct is **request bodies you send** to the API
 (`policy_catalog_id`, `policy_id`, `amount_claimed`, `extend_months`). Responses = camelCase;
 request payloads = snake_case. See `src/api/client.js` for the canonical mapping.
