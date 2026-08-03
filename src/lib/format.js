@@ -22,6 +22,15 @@ export function formatDate(value) {
   });
 }
 
+// Renders a plan/policy name prefixed with its provider-defined catalog `key`
+// (e.g. "PG2 - Premium Gold 2024"). The client NEVER generates the key — it only
+// displays what the API returns. When `key` is null/absent/blank, this returns
+// just the name with no prefix and no stray separator.
+export function formatPlanName(key, name) {
+  const trimmedKey = typeof key === 'string' ? key.trim() : '';
+  return trimmedKey ? `${trimmedKey} - ${name}` : name;
+}
+
 // True when `expiryDate` is in the future but within the next 30 days.
 export function isExpiringSoon(expiryDate) {
   if (!expiryDate) return false;

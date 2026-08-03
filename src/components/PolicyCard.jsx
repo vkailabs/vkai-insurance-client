@@ -7,7 +7,7 @@
 //   and an Enroll button.
 import { Link } from 'react-router-dom';
 import ClaimStatusBadge from './ClaimStatusBadge';
-import { formatCurrency, formatDate, isExpiringSoon } from '../lib/format';
+import { formatCurrency, formatDate, formatPlanName, isExpiringSoon } from '../lib/format';
 
 function StatusPill({ status }) {
   return <span className={`status-pill status-${status}`}>{status}</span>;
@@ -24,7 +24,11 @@ function DashboardCard({ policy, onRenew, renewing }) {
       <div className="policy-card-head">
         <div>
           <h3 className="policy-card-title">
-            <Link to={`/policies/${policy.id}`}>{catalog.name || 'Policy'}</Link>
+            {/* Prefix the policy heading with the plan's `key` (read-through from
+                the provider via the API). Nested premiums/claims below are NOT prefixed. */}
+            <Link to={`/policies/${policy.id}`}>
+              {formatPlanName(policy.key, catalog.name || 'Policy')}
+            </Link>
           </h3>
           <p className="policy-card-meta">Expires {formatDate(policy.expiryDate)}</p>
         </div>
@@ -89,7 +93,8 @@ function CatalogCard({ item, onEnroll, enrolling }) {
   return (
     <article className="policy-card">
       <div className="policy-card-head">
-        <h3 className="policy-card-title">{item.name}</h3>
+        {/* Prefix the plan name with its catalog `key` (e.g. "PG2 - Premium Gold 2024"). */}
+        <h3 className="policy-card-title">{formatPlanName(item.key, item.name)}</h3>
       </div>
       {item.description && <p className="policy-card-desc">{item.description}</p>}
       <dl className="policy-card-figures">

@@ -4,7 +4,7 @@ import { getPolicy, payPremium, fileClaim, renewPolicy } from '../api/client';
 import ClaimStatusBadge from '../components/ClaimStatusBadge';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
-import { formatCurrency, formatDate, isExpiringSoon } from '../lib/format';
+import { formatCurrency, formatDate, formatPlanName, isExpiringSoon } from '../lib/format';
 
 export default function PolicyDetail() {
   const { id } = useParams();
@@ -126,7 +126,9 @@ export default function PolicyDetail() {
 
       <header className="page-header">
         <div>
-          <h1 className="page-title">{catalog.name || 'Policy'}</h1>
+          <h1 className="page-title">
+            {formatPlanName(policy.key ?? catalog.key, catalog.name || 'Policy')}
+          </h1>
           <p className="page-subtitle">
             <span className={`status-pill status-${policy.status}`}>{policy.status}</span>
             <span className="muted"> · Expires {formatDate(policy.expiryDate)}</span>

@@ -48,6 +48,29 @@ Practically, this means:
 - Premium and coverage amounts, policy names, and descriptions originate on the provider side.
 - The client experience is "shop the shelf and enroll," not "design your own insurance."
 
+#### Plan `key` prefix (display-only, provider-owned)
+
+Each catalog entry carries a provider-defined `key` (e.g. `PG2`, or a collision-suffixed
+`PG2-2`). It originates on the provider side, syncs to the client side, and the client API
+exposes it. The **client never generates or fabricates a key** — it only displays what the
+API returns (a read-through of provider data).
+
+Where it shows:
+
+- **Catalog page** — each plan renders its `key` as a prefix on the plan name, e.g.
+  `PG2 - Premium Gold 2024`. Read from the `key` field on each catalog row.
+- **Dashboard / "Your policies"** — each enrolled policy renders its plan's `key` as a prefix
+  on the **policy card heading only**. Read from the **top-level `key`** on each policy object
+  (already resolved from the catalog by the API). Nested premium and claim line items under a
+  policy card are **not** individually prefixed.
+- **Policy detail page** (`/policies/:id`) — the single policy's plan name renders its `key`
+  as a prefix on the **main page heading only**. Read from the **top-level `key`** on the
+  policy object, falling back to the nested `policyCatalog.key`. Nested premium and claim line
+  items on this page are **not** individually prefixed.
+
+When `key` is `null`/absent/blank (e.g. a catalog entry not yet refreshed), the name is shown
+with **no prefix and no stray separator**.
+
 ## Where this repo sits (and what it deliberately doesn't know)
 
 This repo talks to exactly **one thing**: its own backend, `vkai-insurance-client-api`. It has
