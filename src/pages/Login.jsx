@@ -29,7 +29,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1 className="auth-title">Welcome back</h1>
+        <h1 className="auth-title auth-title-centered">Client Portal</h1>
         <p className="auth-subtitle">Sign in to your VK AI Labs Insurance account.</p>
 
         <ErrorMessage message={error} />

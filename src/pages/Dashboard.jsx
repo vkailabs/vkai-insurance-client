@@ -40,6 +40,17 @@ export default function Dashboard() {
     load();
   }, [load]);
 
+  // Derive Active/Pending counts client-side from the already-loaded policy data
+  // (GET /v1/policies). Status values come back lowercase (e.g. "active",
+  // "pending") even though the UI displays them capitalized, so we match on the
+  // lowercased status. No extra API call is made.
+  const activeCount = policies.filter(
+    (p) => (p.status || '').toLowerCase() === 'active'
+  ).length;
+  const pendingCount = policies.filter(
+    (p) => (p.status || '').toLowerCase() === 'pending'
+  ).length;
+
   async function handleRenew(policyId) {
     setRenewingId(policyId);
     setError('');
@@ -55,6 +66,19 @@ export default function Dashboard() {
 
   return (
     <div className="page">
+      {!loading && !error && (
+        <div className="policy-summary">
+          <div className="summary-box">
+            <span className="summary-count">{activeCount}</span>
+            <span className="summary-label">Active</span>
+          </div>
+          <div className="summary-box">
+            <span className="summary-count">{pendingCount}</span>
+            <span className="summary-label">Pending</span>
+          </div>
+        </div>
+      )}
+
       <header className="page-header">
         <h1 className="page-title">Your policies</h1>
         <Link to="/catalog" className="btn btn-primary btn-small">
