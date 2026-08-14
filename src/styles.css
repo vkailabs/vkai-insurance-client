@@ -257,6 +257,19 @@ h4 {
   gap: 1.25rem;
 }
 
+/* Dashboard "Your Active Policies" / "Your Pending Policies" sections. Each
+   renders its own .section-title heading and either a .card-grid of policies or
+   a short .policy-section-empty message when that bucket has no policies. Both
+   headings always render, even when their bucket is empty. */
+.policy-section {
+  margin-bottom: 2rem;
+}
+
+.policy-section-empty {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 .card,
 .policy-card {
   background: var(--color-surface);
