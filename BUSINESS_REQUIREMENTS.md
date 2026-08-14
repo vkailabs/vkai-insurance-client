@@ -125,6 +125,31 @@ compared case-insensitively (status arrives lowercase, e.g. `active`/`pending`,
 even though the status pill displays it capitalized). Both boxes always render:
 when a status has no policies, its box shows `0` rather than being hidden.
 
+## Dashboard policy sections (Active vs Pending)
+
+Below the summary boxes, the customer's enrolled policies are shown in **two
+separate sections**, each under its own always-visible heading:
+
+1. **"Your Active Policies"** (first section)
+2. **"Your Pending Policies"** (second section)
+
+The split is **derived entirely client-side** from the already-loaded policy data
+(`GET /v1/policies`) — no extra API call, no new endpoint — using the same
+case-insensitive `status` matching as the summary counts (status arrives
+lowercase):
+
+- **"Your Pending Policies"** = policies whose `status` (lowercased) is `pending`.
+- **"Your Active Policies"** = **all other (non-pending) policies** — `active`
+  plus any other status (e.g. expired/cancelled/renewed). Nothing is ever hidden;
+  every policy appears in **exactly one** of the two sections.
+
+Both section headings **always render**, even when a bucket is empty. An empty
+bucket shows a short message ("No active policies." / "No pending policies.")
+instead of a policy grid. This two-section layout only applies when the customer
+has at least one policy; when they have **no policies at all**, the existing
+whole-page empty state ("No policies yet / Browse the catalog") takes precedence
+and is shown instead of the two sections.
+
 ## Scope boundaries
 
 - **No real payments.** Premium payment is simulated end-to-end.

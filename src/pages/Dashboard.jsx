@@ -51,6 +51,18 @@ export default function Dashboard() {
     (p) => (p.status || '').toLowerCase() === 'pending'
   ).length;
 
+  // Split the loaded policies into two buckets for the dashboard sections,
+  // reusing the same lowercased-status matching as the summary counts above.
+  // "Pending" = status === "pending"; "Active" = everything else (active plus
+  // any other status such as expired/cancelled/renewed) so no policy is ever
+  // hidden and each appears in exactly one section.
+  const pendingPolicies = policies.filter(
+    (p) => (p.status || '').toLowerCase() === 'pending'
+  );
+  const activePolicies = policies.filter(
+    (p) => (p.status || '').toLowerCase() !== 'pending'
+  );
+
   async function handleRenew(policyId) {
     setRenewingId(policyId);
     setError('');
@@ -108,18 +120,46 @@ export default function Dashboard() {
         </div>
       )}
 
-      {!loading && policies.length > 0 && (
-        <div className="card-grid">
-          {policies.map((policy) => (
-            <PolicyCard
-              key={policy.id}
-              variant="dashboard"
-              item={policy}
-              onRenew={handleRenew}
-              renewing={renewingId === policy.id}
-            />
-          ))}
-        </div>
+      {!loading && !error && policies.length > 0 && (
+        <>
+          <section className="policy-section">
+            <h2 className="section-title">Your Active Policies</h2>
+            {activePolicies.length > 0 ? (
+              <div className="card-grid">
+                {activePolicies.map((policy) => (
+                  <PolicyCard
+                    key={policy.id}
+                    variant="dashboard"
+                    item={policy}
+                    onRenew={handleRenew}
+                    renewing={renewingId === policy.id}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="policy-section-empty">No active policies.</p>
+            )}
+          </section>
+
+          <section className="policy-section">
+            <h2 className="section-title">Your Pending Policies</h2>
+            {pendingPolicies.length > 0 ? (
+              <div className="card-grid">
+                {pendingPolicies.map((policy) => (
+                  <PolicyCard
+                    key={policy.id}
+                    variant="dashboard"
+                    item={policy}
+                    onRenew={handleRenew}
+                    renewing={renewingId === policy.id}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="policy-section-empty">No pending policies.</p>
+            )}
+          </section>
+        </>
       )}
     </div>
   );
