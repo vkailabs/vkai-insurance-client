@@ -114,6 +114,17 @@ clean and means the customer-facing app only ever depends on a single, stable co
 7. **Renew near expiry** — When a policy is close to its expiry date (within 30 days), the
    customer is offered a **Renew** action that extends the term.
 
+## Dashboard policy summary
+
+Above the "Your policies" list, the dashboard shows two always-visible summary
+boxes: a count of the customer's **Active** policies and a count of their
+**Pending** policies. These counts are **derived entirely client-side** from the
+policy data the dashboard already loads (`GET /v1/policies`) — there is no extra
+API call and no new endpoint. Counting matches on the policy `status` value
+compared case-insensitively (status arrives lowercase, e.g. `active`/`pending`,
+even though the status pill displays it capitalized). Both boxes always render:
+when a status has no policies, its box shows `0` rather than being hidden.
+
 ## Scope boundaries
 
 - **No real payments.** Premium payment is simulated end-to-end.
