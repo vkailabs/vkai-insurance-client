@@ -13,11 +13,14 @@ function StatusPill({ status }) {
   return <span className={`status-pill status-${status}`}>{status}</span>;
 }
 
-function DashboardCard({ policy, onRenew, renewing }) {
+function DashboardCard({ policy, onRenew, renewing, onCancel, cancelling }) {
   const catalog = policy.policyCatalog || {};
   const premiums = policy.premiums || [];
   const claims = policy.claims || [];
   const expiringSoon = isExpiringSoon(policy.expiryDate);
+  // A pending policy can be cancelled by the customer before approval. Only
+  // pending policies show a Cancel action; active/other statuses never do.
+  const isPending = (policy.status || '').toLowerCase() === 'pending';
 
   return (
     <article className="policy-card">
@@ -82,6 +85,16 @@ function DashboardCard({ policy, onRenew, renewing }) {
             disabled={renewing}
           >
             {renewing ? 'Renewing…' : 'Renew'}
+          </button>
+        )}
+        {isPending && onCancel && (
+          <button
+            type="button"
+            className="btn btn-danger btn-small policy-cancel-btn"
+            onClick={() => onCancel(policy.id)}
+            disabled={cancelling}
+          >
+            {cancelling ? 'Cancelling…' : 'Cancel'}
           </button>
         )}
       </div>

@@ -94,6 +94,17 @@ h4 {
   text-decoration: none;
 }
 
+.btn-danger {
+  background: var(--color-surface);
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fee2e2;
+  text-decoration: none;
+}
+
 /* --- Nav bar --------------------------------------------------------------- */
 
 .navbar {
@@ -453,6 +464,11 @@ h4 {
 .status-expired {
   background: #fee2e2;
   color: #b91c1c;
+}
+
+.status-cancelled {
+  background: #e2e8f0;
+  color: #475569;
 }
 
 /* --- Claim status badges --------------------------------------------------- */

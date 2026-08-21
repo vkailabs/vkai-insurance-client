@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getPolicies, renewPolicy } from '../api/client';
+import { getPolicies, renewPolicy, cancelPolicy } from '../api/client';
 import PolicyCard from '../components/PolicyCard';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [renewingId, setRenewingId] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
   // One-time success banner passed via navigation state (e.g. after enrolling).
   const [flash, setFlash] = useState(location.state?.flash || '');
 
@@ -53,15 +54,18 @@ export default function Dashboard() {
 
   // Split the loaded policies into two buckets for the dashboard sections,
   // reusing the same lowercased-status matching as the summary counts above.
-  // "Pending" = status === "pending"; "Active" = everything else (active plus
-  // any other status such as expired/cancelled/renewed) so no policy is ever
-  // hidden and each appears in exactly one section.
+  // "Pending" = status === "pending". "Active" = every non-pending, non-cancelled
+  // status (active plus e.g. expired). `cancelled` is a terminal status that the
+  // customer hides from view: it is deliberately excluded from BOTH sections (and
+  // is already excluded from both summary counts, which only match active/pending),
+  // so a cancelled policy disappears from the dashboard entirely.
   const pendingPolicies = policies.filter(
     (p) => (p.status || '').toLowerCase() === 'pending'
   );
-  const activePolicies = policies.filter(
-    (p) => (p.status || '').toLowerCase() !== 'pending'
-  );
+  const activePolicies = policies.filter((p) => {
+    const status = (p.status || '').toLowerCase();
+    return status !== 'pending' && status !== 'cancelled';
+  });
 
   async function handleRenew(policyId) {
     setRenewingId(policyId);
@@ -73,6 +77,27 @@ export default function Dashboard() {
       setError(err.message || 'Failed to renew policy.');
     } finally {
       setRenewingId(null);
+    }
+  }
+
+  // Cancel a still-pending policy. Requires an explicit confirmation before
+  // acting; on confirm, calls POST /v1/policies/:id/cancel then refetches so the
+  // now-`cancelled` policy drops out of the dashboard (it is hidden from both
+  // sections and both counts).
+  async function handleCancel(policyId) {
+    const confirmed = window.confirm(
+      'Cancel this pending policy? This cannot be undone.'
+    );
+    if (!confirmed) return;
+    setCancellingId(policyId);
+    setError('');
+    try {
+      await cancelPolicy(policyId);
+      await load();
+    } catch (err) {
+      setError(err.message || 'Failed to cancel policy.');
+    } finally {
+      setCancellingId(null);
     }
   }
 
@@ -152,6 +177,8 @@ export default function Dashboard() {
                     item={policy}
                     onRenew={handleRenew}
                     renewing={renewingId === policy.id}
+                    onCancel={handleCancel}
+                    cancelling={cancellingId === policy.id}
                   />
                 ))}
               </div>
