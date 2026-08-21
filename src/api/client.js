@@ -101,3 +101,12 @@ export function renewPolicy(policyId) {
     body: { extend_months: 12 },
   });
 }
+
+// Cancel a still-pending policy before it is approved. The API only allows this
+// while the policy status is `pending` (otherwise it returns 409); on success it
+// returns the updated policy with status `cancelled`.
+export function cancelPolicy(policyId) {
+  return request(`/v1/policies/${policyId}/cancel`, {
+    method: 'POST',
+  });
+}

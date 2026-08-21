@@ -114,6 +114,15 @@ clean and means the customer-facing app only ever depends on a single, stable co
 7. **Renew near expiry** — When a policy is close to its expiry date (within 30 days), the
    customer is offered a **Renew** action that extends the term.
 
+8. **Cancel a pending policy** — While a policy is still **pending** (enrolled but not yet
+   approved by the provider), the customer can **cancel** it from the dashboard before it
+   becomes active. Cancelling requires an explicit confirmation, then calls
+   `POST /v1/policies/:id/cancel` on the client API. The API only permits this while the policy
+   is `pending` (it returns `409` otherwise); on success the policy moves to the terminal
+   status **`cancelled`**. Only pending policies offer a Cancel action — active or any other
+   status never does. Once cancelled, the policy is **hidden from the dashboard entirely**
+   (see "Dashboard policy sections" below).
+
 ## Dashboard policy summary
 
 Above the "Your policies" list, the dashboard shows two always-visible summary
@@ -139,16 +148,27 @@ case-insensitive `status` matching as the summary counts (status arrives
 lowercase):
 
 - **"Your Pending Policies"** = policies whose `status` (lowercased) is `pending`.
-- **"Your Active Policies"** = **all other (non-pending) policies** — `active`
-  plus any other status (e.g. expired/cancelled/renewed). Nothing is ever hidden;
-  every policy appears in **exactly one** of the two sections.
+- **"Your Active Policies"** = **every non-pending, non-cancelled policy** —
+  `active` plus any other non-terminal status (e.g. expired).
+
+**Cancelled policies are hidden entirely.** A policy whose `status` (lowercased)
+is `cancelled` is **excluded from BOTH sections and from BOTH summary counts**
+(the counts already only match `active`/`pending`, so cancelled never inflates
+them). This is the deliberate product decision for the customer-initiated
+cancel flow: once a customer cancels a pending policy, it disappears from the
+dashboard and the Pending count drops by one. (The provider-facing terminal
+statuses are `pending | active | expired | cancelled`, arriving lowercase from
+the API.)
 
 Both section headings **always render**, even when a bucket is empty. An empty
 bucket shows a short message ("No active policies." / "No pending policies.")
 instead of a policy grid. This two-section layout only applies when the customer
 has at least one policy; when they have **no policies at all**, the existing
 whole-page empty state ("No policies yet / Browse the catalog") takes precedence
-and is shown instead of the two sections.
+and is shown instead of the two sections. Note that a customer whose only
+policies are all `cancelled` will see both sections render their empty messages
+(rather than the whole-page empty state, which is reserved for a truly empty
+policy list) — this is acceptable.
 
 ## Scope boundaries
 
