@@ -52,6 +52,17 @@ export default function Dashboard() {
     (p) => (p.status || '').toLowerCase() === 'pending'
   ).length;
 
+  // Count of visible policies shown in the "Your Policies (N)" heading. Derived
+  // client-side from the already-loaded policy data (no extra API call): every
+  // loaded policy whose lowercased status is NOT `cancelled` — i.e. active +
+  // pending + expired, exactly what the two dashboard sections render. Cancelled
+  // policies are hidden from both sections and both summary counts (VKAI-010), so
+  // the heading count stays consistent with what the customer actually sees. With
+  // an empty `policies` array this is 0, so the heading reads "Your Policies (0)".
+  const visibleCount = policies.filter(
+    (p) => (p.status || '').toLowerCase() !== 'cancelled'
+  ).length;
+
   // Split the loaded policies into two buckets for the dashboard sections,
   // reusing the same lowercased-status matching as the summary counts above.
   // "Pending" = status === "pending". "Active" = every non-pending, non-cancelled
@@ -117,7 +128,7 @@ export default function Dashboard() {
       )}
 
       <header className="page-header">
-        <h1 className="page-title">Your policies</h1>
+        <h1 className="page-title">Your Policies ({visibleCount})</h1>
         <Link to="/catalog" className="btn btn-primary btn-small">
           Browse catalog
         </Link>

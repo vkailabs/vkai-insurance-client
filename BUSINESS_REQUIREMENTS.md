@@ -123,6 +123,24 @@ clean and means the customer-facing app only ever depends on a single, stable co
    status never does. Once cancelled, the policy is **hidden from the dashboard entirely**
    (see "Dashboard policy sections" below).
 
+## Dashboard heading count
+
+The top-of-page heading reads **"Your Policies (N)"** (exact capitalization, a
+single space before the parenthesis, e.g. `Your Policies (3)`). **N is the count
+of *visible* policies** — every loaded policy whose `status` (lowercased) is **not**
+`cancelled` (i.e. active + pending + expired), which is exactly what the two
+dashboard sections render. It is **derived entirely client-side** from the
+already-loaded policy data (`GET /v1/policies`) — no extra API call — reusing the
+same case-insensitive `status` matching as the summary counts and section filters.
+
+**Cancelled policies are excluded** from N, consistent with VKAI-010: cancelled
+policies are hidden from both dashboard sections and both summary counts, so the
+heading count stays consistent with what the customer actually sees. The heading
+renders **unconditionally** (outside the `policies.length > 0` guard), so a customer
+with **zero** policies sees exactly **"Your Policies (0)"**. Because N is derived
+from `policies` state (which is refetched after renew/cancel), the count updates
+correctly after those actions.
+
 ## Dashboard policy summary
 
 Above the "Your policies" list, the dashboard shows two always-visible summary
